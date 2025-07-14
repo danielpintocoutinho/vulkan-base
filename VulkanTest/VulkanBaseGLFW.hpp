@@ -51,6 +51,8 @@ protected:
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 
+	VkShaderModule createShaderModule(const std::vector<char>& code);
+
 private:
 
 	void initWindow(const char* applicationName, const int width, const int height);
