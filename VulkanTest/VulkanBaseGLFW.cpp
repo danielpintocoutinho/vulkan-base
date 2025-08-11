@@ -23,18 +23,16 @@ void VulkanBaseGLFW::initWindow(const char* applicationName, const int width, co
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	this->window = glfwCreateWindow(width, height, applicationName, nullptr, nullptr);
+	glfwSetWindowUserPointer(this->window, this);
+	glfwSetFramebufferSizeCallback(this->window, framebufferResizeCallback);
 }
 
 void VulkanBaseGLFW::cleanup() {
+	cleanupSwapChain();
 	if (enableValidationLayers) {
 		DestroyDebugUtilsMessengerEXT(this->instance, debugMessenger, nullptr);
 	}
 
-	for (auto imageView : this->swapChainImageViews) {
-		vkDestroyImageView(this->device, imageView, nullptr);
-	}
-
-	vkDestroySwapchainKHR(this->device, this->swapChain, nullptr);
 	vkDestroyDevice(this->device, nullptr);
 	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
@@ -491,4 +489,25 @@ VkShaderModule VulkanBaseGLFW::createShaderModule(const std::vector<char>& code)
 	}
 
 	return shaderModule;
+}
+
+void VulkanBaseGLFW::recreateSwapChain() {
+	cleanupSwapChain();
+
+	createSwapChain();
+	createImageViews();
+}
+
+void VulkanBaseGLFW::cleanupSwapChain() {
+	for (auto imageView : this->swapChainImageViews) {
+		vkDestroyImageView(this->device, imageView, nullptr);
+	}
+
+	vkDestroySwapchainKHR(this->device, this->swapChain, nullptr);
+}
+
+
+void VulkanBaseGLFW::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+	auto app = reinterpret_cast<VulkanBaseGLFW*>(glfwGetWindowUserPointer(window));
+	app->framebufferResized = true;
 }

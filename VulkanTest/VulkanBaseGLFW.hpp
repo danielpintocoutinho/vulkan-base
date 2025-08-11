@@ -50,14 +50,21 @@ protected:
 	std::vector<VkImageView> swapChainImageViews;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
+	bool framebufferResized = false;
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
+
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+
+	void recreateSwapChain();
 
 private:
 
 	void initWindow(const char* applicationName, const int width, const int height);
 
 	void cleanup();
+
+	void cleanupSwapChain();
 
 	void initVulkan(const char* applicationName);
 
@@ -78,8 +85,6 @@ private:
 	void pickPhysicalDevice();
 
 	bool isDeviceSuitable(VkPhysicalDevice device);
-
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
 	void createLogicalDevice();
 
@@ -102,5 +107,7 @@ private:
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
+
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 };
 
