@@ -50,13 +50,27 @@ protected:
 	std::vector<VkImageView> swapChainImageViews;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
+	VkRenderPass renderPass;
+	VkImage depthImage;
+	VkDeviceMemory depthImageMemory;
+	VkImageView depthImageView;
+	VkImage colorImage;
+	VkDeviceMemory colorImageMemory;
+	VkImageView colorImageView;
 	bool framebufferResized = false;
+	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
 	void recreateSwapChain();
+
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+	void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSample, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
 
 private:
 
@@ -102,6 +116,18 @@ private:
 
 	void createImageViews();
 
+	void createRenderPass();
+
+	void createDepthResources();
+
+	void createColorResources();
+
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+	VkFormat findDepthFormat();
+
+	bool hasStencilComponent(VkFormat format);
+
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -109,5 +135,7 @@ private:
 		void* pUserData);
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
+	VkSampleCountFlagBits getMaxUsableSampleCount();
 };
 
